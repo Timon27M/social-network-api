@@ -9,7 +9,7 @@ const UnauthorizatedError = require("../errors/UnauthorizatedError");
 const User = require("../models/user");
 
 const getUser = (req, res, next) => {
-  User.findById(req.user._id)
+  User.findById(req.params.userId)
     .orFail(() => {
       throw new NotFoundError("Пользователь не найден");
     })
@@ -81,6 +81,7 @@ const createUser = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret');
       res.status(200).send({
         name: user.name,
+        phone: user.phone,
         email: user.email,
         _id: user._id,
         token,
