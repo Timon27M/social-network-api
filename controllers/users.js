@@ -9,12 +9,17 @@ const UnauthorizatedError = require("../errors/UnauthorizatedError");
 const User = require("../models/user");
 
 const getUser = (req, res, next) => {
-  User.findById(req.params.userId)
+  User.findById(req.user._id)
     .orFail(() => {
       throw new NotFoundError("Пользователь не найден");
     })
     .then((user) => {
-      res.send(user);
+      res.send({
+        name: user,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
@@ -49,7 +54,12 @@ const updateUser = (req, res, next) => {
       throw new NotFoundError('Пользователь не найден');
     })
     .then((user) => {
-      res.send(user);
+      res.send({
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        avatar: user.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -80,10 +90,6 @@ const createUser = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret');
       res.status(200).send({
-        name: user.name,
-        phone: user.phone,
-        email: user.email,
-        _id: user._id,
         token,
       });
     })
@@ -104,7 +110,13 @@ const loginUser = (req, res, next) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret');
-      res.send({ token });
+      res.send({
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        avatar: user.avater,
+        token,
+      });
     })
     .catch(() => {
       next(new UnauthorizatedError('Неправильный логин или пароль'));

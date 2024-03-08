@@ -9,7 +9,7 @@ const routes = require("./routes/index");
 
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
-const { PORT = 3000, DBlink = "mongodb://127.0.0.1:27017/socialApidb" } = process.env;
+const { PORT = 4000, DBlink = "mongodb://127.0.0.1:27017/socialApidb" } = process.env;
 
 const app = express();
 
