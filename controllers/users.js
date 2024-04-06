@@ -6,16 +6,21 @@ const NotFoundError = require("../errors/NotFoundError");
 const IncorrectEmailError = require("../errors/IncorrectEmailError");
 const UnauthorizatedError = require("../errors/UnauthorizatedError");
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const User = require("../models/user");
 
 const getUser = (req, res, next) => {
-  User.findById(req.user._id)
+  const { authorization } = req.headers;
+  const token = authorization.replace('Bearer ', '');
+  const id = jwt.verify(token, `${NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret'}`);
+  User.findById(id)
     .orFail(() => {
       throw new NotFoundError("Пользователь не найден");
     })
     .then((user) => {
       res.send({
-        name: user,
+        name: user.name,
         email: user.email,
         phone: user.phone,
         avatar: user.avatar,
