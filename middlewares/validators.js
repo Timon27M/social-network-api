@@ -23,8 +23,15 @@ const validationUpdateUser = celebrate({
   }),
 });
 
+const validationSearchUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+  }),
+});
+
 module.exports = {
   validationLoginUser,
   validationCreateUser,
   validationUpdateUser,
+  validationSearchUser,
 };

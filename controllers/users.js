@@ -34,6 +34,28 @@ const getUser = (req, res, next) => {
     });
 };
 
+const getSearchUser = (req, res, next) => {
+  const { name } = req.body;
+  User.findOne({ name })
+    .orFail(() => {
+      throw new NotFoundError("Пользователь не найден");
+    })
+    .then((user) => {
+      res.send({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+      });
+    })
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Пользователь не найден"));
+      }
+      return next(err);
+    });
+};
+
 const updateUser = (req, res, next) => {
   const {
     name,
@@ -133,4 +155,5 @@ module.exports = {
   updateUser,
   createUser,
   loginUser,
+  getSearchUser,
 };
