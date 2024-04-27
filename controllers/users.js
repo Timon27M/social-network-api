@@ -99,6 +99,43 @@ const updateUser = (req, res, next) => {
     });
 };
 
+const updateAvatarUser = (req, res, next) => {
+  const {
+    avatar,
+  } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    {
+      avatar,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .orFail(() => {
+      throw new NotFoundError('Пользователь не найден');
+    })
+    .then((user) => {
+      res.send({
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        avatar: user.avatar,
+      });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Переданы некорректные данные'));
+      }
+      if (err.code === 11000) {
+        return next(new IncorrectEmailError('Пользователь с таким email уже существует'));
+      }
+      return next(err);
+    });
+};
+
 const createUser = (req, res, next) => {
   const {
     name,
@@ -156,4 +193,5 @@ module.exports = {
   createUser,
   loginUser,
   getSearchUser,
+  updateAvatarUser,
 };

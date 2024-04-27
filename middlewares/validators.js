@@ -1,4 +1,14 @@
 const { celebrate, Joi } = require('celebrate');
+const isUrl = require('validator/lib/isURL');
+const BadRequestError = require('../errors/BadRequestError');
+
+const validationUrl = (url) => {
+  const validate = isUrl(url);
+  if (validate) {
+    return url;
+  }
+  throw new BadRequestError('Некорректный адрес URL');
+};
 
 const validationLoginUser = celebrate({
   body: Joi.object().keys({
@@ -24,6 +34,11 @@ const validationUpdateUser = celebrate({
     avatar: Joi.string().required(),
   }),
 });
+const validationUpdateUserAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().custom(validationUrl),
+  }),
+});
 
 const validationSearchUser = celebrate({
   body: Joi.object().keys({
@@ -36,4 +51,5 @@ module.exports = {
   validationCreateUser,
   validationUpdateUser,
   validationSearchUser,
+  validationUpdateUserAvatar,
 };
